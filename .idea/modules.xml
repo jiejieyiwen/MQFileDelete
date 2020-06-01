@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/RecordDelete3Day.iml" filepath="$PROJECT_DIR$/.idea/RecordDelete3Day.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/MQFileDelete.iml" filepath="$PROJECT_DIR$/.idea/MQFileDelete.iml" />
     </modules>
   </component>
 </project>
