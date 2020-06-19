@@ -21,10 +21,14 @@ type MongoCon struct {
 }
 
 var recordManager RecordFileMongo
+var recordManager1 RecordFileMongo
 var mongoCon MongoCon
 
 func GetMongoRecordManager() *RecordFileMongo {
 	return &recordManager
+}
+func GetMongoRecordManager1() *RecordFileMongo {
+	return &recordManager1
 }
 
 func GetMongoCOnManager() *MongoCon {
@@ -37,6 +41,7 @@ func init() {
 
 func (record *RecordFileMongo) Init() error {
 	logger := LoggerModular.GetLogger()
+	//动存
 	MongoDBURL := Config.GetConfig().MongoDBConfig.MongoDBURLMongo
 	logger.Infof("ConNUm: [%v], Limit: [%v], Date: [%v]", ConNUm, Limit)
 	for i := 0; i < ConNUm; i++ {
@@ -47,6 +52,19 @@ func (record *RecordFileMongo) Init() error {
 		} else {
 			record.Srv = append(record.Srv, srv)
 			logger.Infof("Init Mongo Connect Success, Url: [%v]", MongoDBURL)
+		}
+	}
+	//全存
+	MongoDBURL = Config.GetConfig().PullStorageConfig.MongoDBURLMongo
+	logger.Infof("ConNUm: [%v], Limit: [%v], Date: [%v]", ConNUm, Limit)
+	for i := 0; i < ConNUm; i++ {
+		var srv MongoModular.MongoDBServ
+		if err := MongoModular.GetMongoDBHandlerWithURL(MongoDBURL, &srv); err != nil {
+			logger.Errorf("Init Pull Mongo Connect Error: [%v]", err)
+			return err
+		} else {
+			recordManager1.Srv = append(recordManager1.Srv, srv)
+			logger.Infof("Init Pull Mongo Connect Success, Url: [%v]", MongoDBURL)
 		}
 	}
 
@@ -77,12 +95,14 @@ func (record *RecordFileMongo) SetInfoMongoToDelete(id, mp string, etime int64, 
 	return srv.Update1("RecordFileInfo", filter, apply, Result)
 }
 
-func (record *RecordFileMongo) DeleteMongoTsAll(id string, srv MongoModular.MongoDBServ, date string) (info *mgo.ChangeInfo, err error, table string) {
+func (record *RecordFileMongo) DeleteMongoTsAll(id string, srv MongoModular.MongoDBServ, date, date1 string) (info *mgo.ChangeInfo, err error, table string) {
 	baseFilter := []interface{}{bson.M{"ChannelInfoID": id}}
+	baseFilter = append(baseFilter, bson.M{"Date": date1})
 	filter := bson.M{"$and": baseFilter}
 	Table := "RecordFileInfo_"
 	Table = Table + date
 	info, err = srv.DeleteAll(Table, filter)
+	//ecord.Logger.Infof("Table is: [%v]", Table)
 	return info, err, Table
 }
 

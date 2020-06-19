@@ -1,6 +1,7 @@
 package TaskDispatch
 
 import (
+	"DeleteFromLocal/MqModular"
 	"github.com/sirupsen/logrus"
 	"iPublic/AMQPModular"
 	"sync"
@@ -15,7 +16,8 @@ type DeleteTask struct {
 	logger *logrus.Entry
 
 	m_pMQConn  *AMQPModular.RabbServer //MQ连接
-	m_strMQURL string                  //MQ连接地址
+	MQCon      MqModular.ConnPool
+	m_strMQURL string //MQ连接地址
 
 	MountPointMQList     map[string][]StreamResData
 	MountPointMQListLock sync.Mutex
